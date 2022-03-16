@@ -9,6 +9,12 @@ class PhotosSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class StatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['status']
+
+
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='first_name')
     photos = PhotosSerializer()

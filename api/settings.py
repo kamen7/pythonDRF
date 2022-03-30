@@ -33,6 +33,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+NUMBER_OF_POSTS = 2
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
-    'follows'
+    'follows',
+    'profiles',
+    'posts'
 ]
 
 MIDDLEWARE = [

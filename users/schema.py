@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from django.db.models import Q
 
 from users.models import CustomUser, Photos
 
@@ -7,7 +8,7 @@ from users.models import CustomUser, Photos
 class CustomUserType(DjangoObjectType):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'status', 'photos', 'followed']
+        fields = ['id', 'username', 'email', 'status', 'photos', 'followed', 'first_name', 'last_name']
 
 
 class PhotosType(DjangoObjectType):
@@ -18,13 +19,21 @@ class PhotosType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     all_users = graphene.List(CustomUserType)
-    users_by_name = graphene.Field(CustomUserType, username=graphene.String(required=True))
+    find_user = graphene.List(CustomUserType,
+                              findBy=graphene.String(required=True),
+                              offset=graphene.Int(required=False),
+                              limit=graphene.Int(required=False))
 
-    def resolve_all_users(root, info):
+    def resolve_all_users(self, info):
         return CustomUser.objects.all()
 
-    def resolve_users_by_name(root, info, username):
-        try:
-            return CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
-            return None
+    def resolve_find_user(self, info, findBy, offset=None, limit=None):
+        qs = CustomUser.objects.filter(Q(username=findBy) | Q(first_name=findBy) | Q(last_name=findBy) |
+                                       Q(email=findBy) | Q(status=findBy))
+        if offset:
+            qs = qs[offset:]
+
+        if limit:
+            qs = qs[:limit]
+
+        return qs
